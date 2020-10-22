@@ -17,9 +17,9 @@ class _HomePageState extends State<HomePage> {
   Country _receiver;
 
   List<Country> _supportedCountryList = [
-    Country(name: '한국', symbol: 'KRW'),
-    Country(name: '일본', symbol: 'JPY'),
-    Country(name: '필리핀', symbol: 'PHP'),
+    Country(name: '한국', code: 'KRW'),
+    Country(name: '일본', code: 'JPY'),
+    Country(name: '필리핀', code: 'PHP'),
   ];
 
   Exchange _exchange;
@@ -32,8 +32,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    _transfer = Country(name: '미국', symbol: 'USD');
-    _receiver = Country(name: '한국', symbol: 'KRW');
+    _transfer = Country(name: '미국', code: 'USD');
+    _receiver = Country(name: '한국', code: 'KRW');
     _transferAmountTextEditingController =
         TextEditingController(text: _transferAmount.toString());
     _convertCurrency();
@@ -165,7 +165,7 @@ class _HomePageState extends State<HomePage> {
                                 Expanded(
                                     child: Padding(
                                   padding: const EdgeInsets.only(left: 8.0),
-                                  child: Text(_transfer.symbol),
+                                  child: Text(_transfer.code),
                                 ))
                               ],
                             ),
@@ -224,8 +224,8 @@ class _HomePageState extends State<HomePage> {
   Future<Exchange> _requestAPI(Exchange exchange) {
     return CurrencyService()
         .live(
-      source: exchange.transfer.symbol,
-      currencies: _supportedCountryList.map((c) => c.symbol).toList(),
+      source: exchange.transfer.code,
+      currencies: _supportedCountryList.map((c) => c.code).toList(),
     )
         .then((ConvertResponse response) {
       Exchange result = exchange;

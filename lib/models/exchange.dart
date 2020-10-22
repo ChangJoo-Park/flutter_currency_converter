@@ -23,7 +23,7 @@ class Exchange {
         assert(amount != null && amount > 0);
 
   String symbolWithDelimiter({delimiter = ''}) {
-    return '${transfer.symbol}$delimiter${receiver.symbol}';
+    return '${transfer.code}$delimiter${receiver.code}';
   }
 
   @override
