@@ -218,9 +218,7 @@ class _HomePageState extends State<HomePage> {
 
   // 수취 국가가 변경되거나, 송금액이 변경되면 호출하여 환전 결과를 반영합니다.
   void _convertCurrency() {
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() => _isLoading = true);
     _requestAPI(Exchange(
       transfer: _transfer,
       receiver: _receiver,
