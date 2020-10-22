@@ -1,6 +1,7 @@
 import 'package:currency_converter/models/convert_response.dart';
 import 'package:currency_converter/models/country.dart';
 import 'package:currency_converter/models/exchange.dart';
+import 'package:currency_converter/services/currency_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -221,22 +222,20 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // TODO: Service 로 변경해야함
   Future<Exchange> _requestAPI(Exchange exchange) {
-    ConvertResponse convertResponse = ConvertResponse.fromJSON({
-      "success": true,
-      "terms": "https:\/\/currencylayer.com\/terms",
-      "privacy": "https:\/\/currencylayer.com\/privacy",
-      "timestamp": 1603298405,
-      "source": "USD",
-      "quotes": {"USDKRW": 1132.140365, "USDJPY": 104.4795, "USDPHP": 48.47702}
+    return CurrencyService()
+        .live(
+      source: exchange.transfer.symbol,
+      currencies: _supportedCountryList.map((c) => c.symbol).toList(),
+    )
+        .then((ConvertResponse response) {
+      Exchange result = exchange;
+      double rate = response.quotes[result.symbolWithDelimiter(delimiter: '')];
+      assert(rate != null);
+      result.rate = rate;
+      result.timestamp = response.timestamp;
+      return result;
     });
-
-    Exchange result = exchange;
-    result.rate =
-        convertResponse.quotes[result.symbolWithDelimiter(delimiter: '')];
-    result.timestamp = convertResponse.timestamp;
-    return Future.value(result);
   }
 
   /// 날짜 포맷
