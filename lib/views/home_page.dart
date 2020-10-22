@@ -99,7 +99,8 @@ class _HomePageState extends State<HomePage> {
                         '환율 : ',
                         textAlign: TextAlign.right,
                       ),
-                      Text('${_exchange ?? ""}'),
+                      Text(
+                          '${_exchange?.receiver?.format?.format(_exchange?.rate) ?? ""}'),
                     ]),
                     TableRow(children: [
                       Text(
