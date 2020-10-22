@@ -3,7 +3,7 @@
 /// API를 요청하여 받은 결과 JSON을 객체로 변환하는 역할을 합니다.
 /// 응답 예
 ///
-/// 요청 : http://apilayer.net/api/live?access_key=460fb34ab450ccdcb229963f03f5fbd2&currencies=EUR,GBP,CAD,PLN&source=USD&format=1
+/// 요청 : http://apilayer.net/api/live?access_key=<ACCESSKEY>&currencies=EUR,GBP,CAD,PLN&source=USD&format=1
 /// {
 ///   "success":true,
 ///   "terms":"https:\/\/currencylayer.com\/terms",
@@ -33,14 +33,14 @@ class ConvertResponse {
     this.quotes,
   });
 
-  factory ConvertResponse.fromJSON(Map<String, dynamic> json) =>
-      ConvertResponse(
-        success: json['success'],
-        terms: json['terms'],
-        privacy: json['privacy'],
-        timestamp:
-            DateTime.fromMillisecondsSinceEpoch(json['timestamp'] * 1000),
-        source: json['source'],
-        quotes: json['quotes'],
-      );
+  factory ConvertResponse.fromJSON(Map<String, dynamic> json) {
+    return ConvertResponse(
+      success: json['success'],
+      terms: json['terms'],
+      privacy: json['privacy'],
+      timestamp: DateTime.fromMillisecondsSinceEpoch(json['timestamp'] * 1000),
+      source: json['source'],
+      quotes: json["quotes"].cast<String, double>(),
+    );
+  }
 }
