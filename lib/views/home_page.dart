@@ -15,6 +15,7 @@ class _HomePageState extends State<HomePage> {
 
   Country _transfer;
   Country _receiver;
+
   List<Country> _supportedCountryList = [
     Country(name: '한국', symbol: 'KRW'),
     Country(name: '일본', symbol: 'JPY'),
@@ -28,6 +29,7 @@ class _HomePageState extends State<HomePage> {
 
   TextEditingController _transferAmountTextEditingController;
   bool _isLoading = true;
+
   @override
   void initState() {
     _transfer = Country(name: '미국', symbol: 'USD');
@@ -255,12 +257,16 @@ class _HomePageState extends State<HomePage> {
   /// 포맷규격 : 'yyyy-MM-dd HH:mm'
   /// 예 : 2019-03-20 16:13
   ///
-  String _formatDateTime(DateTime dateTime, {bool local = true}) {
+  String _formatDateTime(
+    DateTime dateTime, {
+    bool local = true,
+    String format = 'yyyy-MM-dd HH:mm',
+  }) {
     assert(dateTime != null);
     DateTime target = dateTime;
     if (local) {
       target = target.toLocal();
     }
-    return DateFormat('yyyy-MM-dd HH:mm').format(target);
+    return DateFormat(format).format(target);
   }
 }
