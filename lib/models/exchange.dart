@@ -10,8 +10,8 @@ import 'country.dart';
 class Exchange {
   Country transfer;
   Country receiver;
-  double amount;
-  double rate;
+  double amount = 0;
+  double rate = 0;
   DateTime timestamp;
 
   Exchange({
@@ -22,7 +22,7 @@ class Exchange {
         assert(receiver != null),
         assert(amount != null && amount > 0);
 
-  symbolWithDelimiter({delimiter = ''}) {
+  String symbolWithDelimiter({delimiter = ''}) {
     return '${transfer.symbol}$delimiter${receiver.symbol}';
   }
 
