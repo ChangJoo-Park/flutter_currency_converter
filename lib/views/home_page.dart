@@ -6,6 +6,24 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String transferCountryName = '미국';
+  String transferSymbol = 'USD';
+  String receiverCountryName = '한국';
+  String receiverSymbol = 'KRW';
+  String exchangeRate = '1,130.05 KRW/USD';
+  String requestDateTime = '2019-03-20 16:13';
+  double transferAmount = 100;
+  String recieveAmount = '113,004.98 KRW';
+
+  TextEditingController transferAmountTextEditingController;
+
+  @override
+  void initState() {
+    transferAmountTextEditingController =
+        TextEditingController(text: transferAmount.toString());
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -33,28 +51,28 @@ class _HomePageState extends State<HomePage> {
                         '송금 국가 : ',
                         textAlign: TextAlign.right,
                       ),
-                      Text('미국(USD)'),
+                      Text('$transferCountryName ($transferSymbol)'),
                     ]),
                     TableRow(children: [
                       Text(
                         '수취국가 : ',
                         textAlign: TextAlign.right,
                       ),
-                      Text('한국 (KRW)'),
+                      Text('$receiverCountryName ($receiverSymbol)'),
                     ]),
                     TableRow(children: [
                       Text(
                         '환율 : ',
                         textAlign: TextAlign.right,
                       ),
-                      Text('1,130.05 KRW/USD'),
+                      Text(exchangeRate),
                     ]),
                     TableRow(children: [
                       Text(
                         '조회 시간 : ',
                         textAlign: TextAlign.right,
                       ),
-                      Text('2019-03-20 16:13'),
+                      Text(requestDateTime),
                     ]),
                     TableRow(
                       decoration: BoxDecoration(),
@@ -71,6 +89,9 @@ class _HomePageState extends State<HomePage> {
                               child: Container(
                                 height: 24,
                                 child: TextField(
+                                  controller:
+                                      transferAmountTextEditingController,
+                                  onSubmitted: (String value) {},
                                   keyboardType: TextInputType.numberWithOptions(
                                       decimal: false, signed: false),
                                   textAlign: TextAlign.right,
@@ -93,7 +114,11 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                             ),
-                            Expanded(child: Text(' USD'))
+                            Expanded(
+                                child: Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: Text(transferSymbol),
+                            ))
                           ],
                         ),
                       ],
@@ -106,7 +131,7 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.all(8.0),
                 child: Center(
                   child: Text(
-                    '수취금액은 113,004.98 KRW 입니다.',
+                    '수취금액은 $recieveAmount 입니다.',
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
