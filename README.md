@@ -1,16 +1,7 @@
-# currency_converter
+# Flutter 환율 계산기
 
-A new Flutter project.
+- https://currencylayer.com/ API 를 사용합니다.
+- .env.sample 파일을 .env로 복사하세요
+- .env 파일의 CURRENCY_LAYER_ACCESS_KEY, CURRENCY_LAYER_BASE_URL 를 채우세요
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+> 릴리즈 모드로 빌드했을때만 실제 API를 사용합니다 자세한 내용은 currency_service.dart 를 확인하세요
