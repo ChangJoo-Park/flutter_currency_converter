@@ -118,7 +118,7 @@ class _HomePageState extends State<HomePage> {
                           direction: Axis.horizontal,
                           children: [
                             Expanded(
-                              flex: 1,
+                              flex: 2,
                               child: Container(
                                 child: Form(
                                   key: _formKey,
@@ -128,10 +128,13 @@ class _HomePageState extends State<HomePage> {
                                     onFieldSubmitted: _onFieldSubmitted,
                                     validator: (value) {
                                       try {
-                                        double.parse(value);
+                                        double amount = double.parse(value);
+                                        if (amount < 0 || amount > 10000) {
+                                          throw Error();
+                                        }
                                         return null;
                                       } catch (e) {
-                                        return '올바른 송금액을 입력하세요.';
+                                        return '송금액이 바르지 않습니다.';
                                       }
                                     },
                                     onSaved: (String value) {
