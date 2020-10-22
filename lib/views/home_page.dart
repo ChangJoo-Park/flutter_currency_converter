@@ -6,21 +6,26 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String transferCountryName = '미국';
-  String transferSymbol = 'USD';
-  String receiverCountryName = '한국';
-  String receiverSymbol = 'KRW';
-  String exchangeRate = '1,130.05 KRW/USD';
-  String requestDateTime = '2019-03-20 16:13';
-  double transferAmount = 100;
-  String recieveAmount = '113,004.98 KRW';
+  final _formKey = GlobalKey<FormState>();
 
-  TextEditingController transferAmountTextEditingController;
+  Country _transfer;
+  Country _receiver;
+  String _exchangeRate = '1,130.05 KRW/USD';
+  String _requestDateTime = '2019-03-20 16:13';
+
+  double _transferAmount = 100;
+
+  String _recieveAmount = '113,004.98 KRW';
+
+  TextEditingController _transferAmountTextEditingController;
 
   @override
   void initState() {
-    transferAmountTextEditingController =
-        TextEditingController(text: transferAmount.toString());
+    _transfer = Country(name: '미국', symbol: 'USD');
+    _receiver = Country(name: '한국', symbol: 'KRW');
+
+    _transferAmountTextEditingController =
+        TextEditingController(text: _transferAmount.toString());
     super.initState();
   }
 
@@ -51,28 +56,28 @@ class _HomePageState extends State<HomePage> {
                         '송금 국가 : ',
                         textAlign: TextAlign.right,
                       ),
-                      Text('$transferCountryName ($transferSymbol)'),
+                      Text(_transfer.nameWithSymbol),
                     ]),
                     TableRow(children: [
                       Text(
                         '수취국가 : ',
                         textAlign: TextAlign.right,
                       ),
-                      Text('$receiverCountryName ($receiverSymbol)'),
+                      Text(_receiver.nameWithSymbol),
                     ]),
                     TableRow(children: [
                       Text(
                         '환율 : ',
                         textAlign: TextAlign.right,
                       ),
-                      Text(exchangeRate),
+                      Text(_exchangeRate),
                     ]),
                     TableRow(children: [
                       Text(
                         '조회 시간 : ',
                         textAlign: TextAlign.right,
                       ),
-                      Text(requestDateTime),
+                      Text(_requestDateTime),
                     ]),
                     TableRow(
                       decoration: BoxDecoration(),
@@ -87,28 +92,45 @@ class _HomePageState extends State<HomePage> {
                             Expanded(
                               flex: 1,
                               child: Container(
-                                height: 24,
-                                child: TextField(
-                                  controller:
-                                      transferAmountTextEditingController,
-                                  onSubmitted: (String value) {},
-                                  keyboardType: TextInputType.numberWithOptions(
-                                      decimal: false, signed: false),
-                                  textAlign: TextAlign.right,
-                                  decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 4,
-                                      vertical: 0,
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(0),
-                                      borderSide: BorderSide(
-                                          color: Colors.blueAccent, width: 1.0),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(0),
-                                      borderSide: BorderSide(
-                                          color: Colors.grey, width: 1.0),
+                                child: Form(
+                                  key: _formKey,
+                                  child: TextFormField(
+                                    controller:
+                                        _transferAmountTextEditingController,
+                                    onFieldSubmitted: _onFieldSubmitted,
+                                    validator: (value) {
+                                      try {
+                                        double.parse(value);
+                                        return null;
+                                      } catch (e) {
+                                        return '올바른 송금액을 입력하세요.';
+                                      }
+                                    },
+                                    onSaved: (String value) {
+                                      setState(() => _transferAmount =
+                                          double.parse(value));
+                                    },
+                                    keyboardType:
+                                        TextInputType.numberWithOptions(
+                                            decimal: false, signed: false),
+                                    textAlign: TextAlign.right,
+                                    decoration: InputDecoration(
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                        horizontal: 4,
+                                        vertical: 0,
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(0),
+                                        borderSide: BorderSide(
+                                            color: Colors.blueAccent,
+                                            width: 1.0),
+                                      ),
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(0),
+                                        borderSide: BorderSide(
+                                            color: Colors.grey, width: 1.0),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -117,7 +139,7 @@ class _HomePageState extends State<HomePage> {
                             Expanded(
                                 child: Padding(
                               padding: const EdgeInsets.only(left: 8.0),
-                              child: Text(transferSymbol),
+                              child: Text(_transfer.symbol),
                             ))
                           ],
                         ),
@@ -131,7 +153,7 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.all(8.0),
                 child: Center(
                   child: Text(
-                    '수취금액은 $recieveAmount 입니다.',
+                    '수취금액은 $_recieveAmount 입니다.',
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
@@ -142,4 +164,36 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  void _onFieldSubmitted(value) {
+    if (!_formKey.currentState.validate()) {
+      return;
+    }
+
+    _formKey.currentState.save();
+    _convertCurrency(
+      transfer: _transfer,
+      receiver: _receiver,
+      amount: _transferAmount,
+    ).then((value) {
+      setState(() {
+        _requestDateTime = DateTime.now().toLocal().toIso8601String();
+      });
+    });
+  }
+
+  Future _convertCurrency({Country transfer, Country receiver, double amount}) {
+    return Future.value(100);
+  }
+}
+
+class Country {
+  String name;
+  String symbol;
+
+  Country({@required this.name, @required this.symbol})
+      : assert(name != null),
+        assert(symbol != null);
+
+  String get nameWithSymbol => '$name ($symbol)';
 }
