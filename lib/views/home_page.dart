@@ -66,17 +66,11 @@ class _HomePageState extends State<HomePage> {
                       },
                       children: [
                         TableRow(children: [
-                          Text(
-                            '송금 국가 : ',
-                            textAlign: TextAlign.right,
-                          ),
+                          const TableLabel(text: '송금 국가'),
                           Text(_transfer.nameWithSymbol),
                         ]),
                         TableRow(children: [
-                          Text(
-                            '수취 국가 : ',
-                            textAlign: TextAlign.right,
-                          ),
+                          const TableLabel(text: '수취 국가'),
                           GestureDetector(
                             child: Text(_receiver.nameWithSymbol),
                             onTap: () {
@@ -101,27 +95,18 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ]),
                         TableRow(children: [
-                          Text(
-                            '환율 : ',
-                            textAlign: TextAlign.right,
-                          ),
+                          const TableLabel(text: '환율'),
                           Text(
                               '${_exchange?.receiver?.format?.format(_exchange?.rate) ?? ""}'),
                         ]),
                         TableRow(children: [
-                          Text(
-                            '조회 시간 : ',
-                            textAlign: TextAlign.right,
-                          ),
+                          const TableLabel(text: '조회시간'),
                           Text(_requestDateTime),
                         ]),
                         TableRow(
                           decoration: BoxDecoration(),
                           children: [
-                            Text(
-                              '송금액 : ',
-                              textAlign: TextAlign.right,
-                            ),
+                            const TableLabel(text: '송금액'),
                             Flex(
                               direction: Axis.horizontal,
                               children: [
@@ -268,5 +253,18 @@ class _HomePageState extends State<HomePage> {
       target = target.toLocal();
     }
     return DateFormat(format).format(target);
+  }
+}
+
+class TableLabel extends StatelessWidget {
+  const TableLabel({Key key, this.text = ''}) : super(key: key);
+
+  final String text;
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      '$text : ',
+      textAlign: TextAlign.right,
+    );
   }
 }
