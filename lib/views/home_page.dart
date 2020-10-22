@@ -1,4 +1,8 @@
+import 'package:currency_converter/models/convert_response.dart';
+import 'package:currency_converter/models/country.dart';
+import 'package:currency_converter/models/exchange.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -10,12 +14,16 @@ class _HomePageState extends State<HomePage> {
 
   Country _transfer;
   Country _receiver;
-  String _exchangeRate = '1,130.05 KRW/USD';
-  String _requestDateTime = '2019-03-20 16:13';
+  List<Country> _supportedCountryList = [
+    Country(name: '한국', symbol: 'KRW'),
+    Country(name: '일본', symbol: 'JPY'),
+    Country(name: '필리핀', symbol: 'PHP'),
+  ];
 
+  Exchange _exchange;
+  String _requestDateTime = '';
   double _transferAmount = 100;
-
-  String _recieveAmount = '113,004.98 KRW';
+  String _receiveAmount = '';
 
   TextEditingController _transferAmountTextEditingController;
 
@@ -23,9 +31,9 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     _transfer = Country(name: '미국', symbol: 'USD');
     _receiver = Country(name: '한국', symbol: 'KRW');
-
     _transferAmountTextEditingController =
         TextEditingController(text: _transferAmount.toString());
+    _convertCurrency();
     super.initState();
   }
 
@@ -60,17 +68,37 @@ class _HomePageState extends State<HomePage> {
                     ]),
                     TableRow(children: [
                       Text(
-                        '수취국가 : ',
+                        '수취 국가 : ',
                         textAlign: TextAlign.right,
                       ),
-                      Text(_receiver.nameWithSymbol),
+                      GestureDetector(
+                        child: Text(_receiver.nameWithSymbol),
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            child: SimpleDialog(
+                              title: Text('대상 국가를 선택하세요'),
+                              children: _supportedCountryList
+                                  .map((country) => SimpleDialogOption(
+                                        child: Text(country.nameWithSymbol),
+                                        onPressed: () {
+                                          setState(() => _receiver = country);
+                                          Navigator.of(context).pop();
+                                          _convertCurrency();
+                                        },
+                                      ))
+                                  .toList(),
+                            ),
+                          );
+                        },
+                      ),
                     ]),
                     TableRow(children: [
                       Text(
                         '환율 : ',
                         textAlign: TextAlign.right,
                       ),
-                      Text(_exchangeRate),
+                      Text('${_exchange ?? ""}'),
                     ]),
                     TableRow(children: [
                       Text(
@@ -153,7 +181,7 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.all(8.0),
                 child: Center(
                   child: Text(
-                    '수취금액은 $_recieveAmount 입니다.',
+                    '수취금액은 $_receiveAmount 입니다.',
                     style: TextStyle(fontSize: 16),
                   ),
                 ),
@@ -165,35 +193,60 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // 모바일 키보드의 Submit 버튼을 눌렀을 때 발생
   void _onFieldSubmitted(value) {
     if (!_formKey.currentState.validate()) {
       return;
     }
 
     _formKey.currentState.save();
-    _convertCurrency(
+    _convertCurrency();
+  }
+
+  // 수취 국가가 변경되거나, 송금액이 변경되면 호출하여 환전 결과를 반영합니다.
+  void _convertCurrency() {
+    _requestAPI(Exchange(
       transfer: _transfer,
       receiver: _receiver,
       amount: _transferAmount,
-    ).then((value) {
+    )).then((Exchange exchange) {
       setState(() {
-        _requestDateTime = DateTime.now().toLocal().toIso8601String();
+        _exchange = exchange;
+        _requestDateTime = _formatDateTime(exchange.timestamp.toLocal());
+        _receiveAmount = _receiver.format.format(_exchange.receiveAmount);
       });
     });
   }
 
-  Future _convertCurrency({Country transfer, Country receiver, double amount}) {
-    return Future.value(100);
+  // TODO: Service 로 변경해야함
+  Future<Exchange> _requestAPI(Exchange exchange) {
+    ConvertResponse convertResponse = ConvertResponse.fromJSON({
+      "success": true,
+      "terms": "https:\/\/currencylayer.com\/terms",
+      "privacy": "https:\/\/currencylayer.com\/privacy",
+      "timestamp": 1603298405,
+      "source": "USD",
+      "quotes": {"USDKRW": 1132.140365, "USDJPY": 104.4795, "USDPHP": 48.47702}
+    });
+
+    Exchange result = exchange;
+    result.rate =
+        convertResponse.quotes[result.symbolWithDelimiter(delimiter: '')];
+    result.timestamp = convertResponse.timestamp;
+    return Future.value(result);
   }
-}
 
-class Country {
-  String name;
-  String symbol;
-
-  Country({@required this.name, @required this.symbol})
-      : assert(name != null),
-        assert(symbol != null);
-
-  String get nameWithSymbol => '$name ($symbol)';
+  /// 날짜 포맷
+  ///
+  /// 포맷규격 : 'yyyy-MM-dd HH:mm'
+  /// 예 : 2019-03-20 16:13
+  ///
+  String _formatDateTime(DateTime dateTime, {bool local = true}) {
+    assert(dateTime != null);
+    DateTime target = dateTime;
+    if (local) {
+      target = target.toLocal();
+    }
+    return DateFormat('yyyy-MM-dd HH:mm').format(target);
+  }
 }
